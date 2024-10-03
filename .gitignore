@@ -1,0 +1,34 @@
+# Ignore sbt specific files
+target/
+project/target/
+project/project/
+
+# IntelliJ IDEA files
+.idea/
+*.iws
+*.iml
+*.ipr
+.idea_modules/
+*.sublime-workspace
+*.sublime-project
+
+# IDE history and other config files
+.history3
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+*~
+
+# Ignore sbt logs
+logs/
+project/.bsp/
+
+# Scala REPL history
+.scala_history
+
+# MacOS specific files
+.DS_Store
