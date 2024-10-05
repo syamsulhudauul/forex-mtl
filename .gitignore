@@ -1,9 +1,13 @@
 # Ignore sbt specific files
+.metals/
+.bloop/
 target/
+project/.bloop
 project/target/
 project/project/
 
-# IntelliJ IDEA files
+# IDE Files
+.vscode/
 .idea/
 *.iws
 *.iml
