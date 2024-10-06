@@ -5,4 +5,4 @@ services:
     image: paidyinc/one-frame
     container_name: one-frame-service
     ports:
-      - "8080:8080"
+      - "8090:8080"
