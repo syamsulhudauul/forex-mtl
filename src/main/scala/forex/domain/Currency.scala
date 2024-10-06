@@ -1,6 +1,8 @@
 package forex.domain
 
 import cats.Show
+import io.circe.Decoder
+import io.circe.HCursor
 
 sealed trait Currency
 
@@ -39,4 +41,9 @@ object Currency {
     case "USD" => USD
   }
 
+  implicit val currencyDecoder: Decoder[Currency] = new Decoder[Currency] {
+    final def apply(c: HCursor): Decoder.Result[Currency] =
+      c.as[String].map(Currency.fromString)
+  }
 }
+

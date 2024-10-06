@@ -10,5 +10,6 @@
     </root>
 
     <logger name="http4s"/>
+    <logger name="forex.services.rates.interpreters" level="debug"/>
   </configuration>
 
