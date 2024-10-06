@@ -20,7 +20,7 @@ Please note that the one-service API has a limitation of 1,000 calls per day.
 TBA
 
 # Technical Overview
-In this project, I tried to implement these technical aspect to achieve good microservice standard.
+In this project, I tried to implement these technical aspects to achieve a good microservice standard.
 ## Frameworks and Libraries
 - **HTTP Framework**: http4s
 - **Configuration Management**: PureConfig
@@ -29,7 +29,7 @@ In this project, I tried to implement these technical aspect to achieve good mic
 
 ## Resilience and Fault Tolerance
 - Implement the Circuit Breaker pattern to prevent cascading failures across services.
-~~- Introduce the SingleFlight mechanism to optimize redundant requests.~~ Can't develop the SingleFlight because dependencies version issue. 
+- ~~Introduce the SingleFlight mechanism to optimize redundant requests.~~ The SingleFlight mechanism could not be implemented due to dependency version conflicts. This feature may be added in the future when compatibility issues are resolved.
 
 ## Testing
 - **Unit Testing**: Employ ScalaTest or MUnit for unit testing individual functions and logic.
