@@ -16,7 +16,7 @@ case class HttpConfig(
 /**
  * Configuration for the call wrapper.
  *
- * @param cbName The name of the caller function or use case
+ * @param name The name of the caller function or use case, will be used on cb
  * @param failureRateThreshold The failure rate threshold (in percentage) to open the circuit breaker
  * @param waitDurationInOpenState The waiting time for the circuit breaker to allow upstream service recovery
  * @param cacheTTL The cache time-to-live
@@ -24,7 +24,7 @@ case class HttpConfig(
  * @param enableCache Whether to enable caching
  */
 case class CallWrapperConfig(
-  cbName: String,
+  name: String,
   failureRateThreshold: Int,
   waitDurationInOpenState: FiniteDuration,
   cacheTTL: FiniteDuration,
