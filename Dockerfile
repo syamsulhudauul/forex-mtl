@@ -1,4 +1,14 @@
-FROM openjdk:11
+FROM sbtscala/scala-sbt:openjdk-8u342_1.8.0_2.13.10 as builder
+
 WORKDIR /app
-COPY ./target/scala-2.13/my-service.jar .
-ENTRYPOINT ["java", "-jar", "my-service.jar"]
+COPY . /app
+RUN sbt assembly
+
+FROM openjdk:8-jre-alpine
+
+WORKDIR /app
+COPY --from=builder /app/target/scala-2.13/*-assembly-*.jar /app/app.jar
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "/app/app.jar"]
