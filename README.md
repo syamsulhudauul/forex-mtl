@@ -6,89 +6,108 @@ This project is a live interpreter for a one-frame service that provides exchang
 2. The exchange rate must not be older than 5 minutes.
 3. The service is designed to handle at least 10,000 successful requests per day with a single API token.
 
-Please note that the one-service API has a limitation of 1,000 calls per day.
+Please note that the one-frame API has a limitation of 1,000 calls per day.
+
+## Disclaimer
+This project heavily leverages generative AI platforms such as OpenAI and Claude. As someone who was unfamiliar with the Scala programming language, these tools were invaluable in helping me understand and implement Scala concepts effectively. Their assistance made it possible for me to deliver a well-architected solution despite my initial lack of experience with Scala.
 
 ## Prerequisite
 - Docker
-- Java ~ openjdk 17.0.12 2024-07-16
+- Java ~ openjdk 17.0.12 (2024-07-16)
 - scalaVersion "2.13.12"
 - sbt.version "1.9.2"
 
 ## How to Run This Project Locally
-please copy .env.example to .env and filled the values with the correct value before Run the project
-for ONE_FRAME_TOKEN you can use: `10dc303535874aeccc86a8251e6992f5` like mentioned on https://hub.docker.com/r/paidyinc/one-frame
-there is some option that you can do: 
-1. Using docker
-   - Start all in once by running `docker-compose --profile app up -d --build`.
-2. Compile and run the project locally:
-    - `docker-compose up -d` --> spawn Dependencies on local
-    - `make all` -> to execute sbt clean,update n compile.
-    - `make run` -> to run the app.
-3. Run test only
-   - Execute tests via the SBT console.
-   OR
-   - `make test`
-please copy .env.example to .env and filled the values with the correct value before Run the project 
+Before running the project, ensure you copy the `.env.example` file to `.env` and populate it with the correct values. For the `ONE_FRAME_TOKEN`, you can use: `10dc303535874aeccc86a8251e6992f5` as mentioned on the [Docker Hub for paidyinc/one-frame](https://hub.docker.com/r/paidyinc/one-frame).
 
+You can choose from the following options to run the project:
 
-# Detailed Solution
+1. **Using Docker**:
+   - Start everything at once by running:
+     ```bash
+     docker-compose --profile app up -d --build
+     ```
+
+2. **Compile and run the project locally**:
+   - Spawn the necessary dependencies locally:
+     ```bash
+     docker-compose up -d
+     ```
+   - Compile the project:
+     ```bash
+     make all
+     ```
+   - Run the app:
+     ```bash
+     make run
+     ```
+
+3. **Run tests only**:
+   - Execute tests via the SBT console, or simply run:
+     ```bash
+     make test
+     ```
+
 ## System Diagram
 ![local-proxy.drawio.png](local-proxy.drawio.png)
-The following diagram illustrates the workflow for the /rates API endpoint. It highlights the different components and logic involved in processing requests and managing metrics.
 
+### Workflow Description
+The following diagram outlines the logic behind the `/rates` API endpoint. The workflow demonstrates how requests are handled and how caching, circuit breaking, and metrics recording work together to ensure efficiency and reliability.
 
-Workflow Description
-Middleware (Logging & Metrics):
+**Workflow Steps:**
 
-Every request to the /rates endpoint goes through middleware that handles logging and metrics collection. This ensures that relevant data is captured for monitoring and troubleshooting.
-Rates Handler:
+1. **Middleware (Logging & Metrics)**:  
+   All requests to the `/rates` endpoint pass through middleware that handles logging and metrics collection, ensuring all request data is captured for monitoring and diagnostics.
 
-The /rates handler receives the incoming request. At this point, it checks if the requested currency pair is supported.
-Supported Pair Check:
+2. **Rates Handler**:  
+   The `/rates` handler processes the request and checks if the currency pair is supported.
 
-The system verifies whether the currency pair specified in the request is supported. If the pair is not supported, the handler will return an error response.
-Call Wrapper:
+3. **Supported Pair Check**:  
+   If the currency pair is not supported, the handler immediately returns an error.
 
-If the pair is supported, the request is processed using the callWrapper class. This component is responsible for managing the logic related to caching and circuit breaking:
-Cached TTL Check: The callWrapper checks if the response for the requested currency pair is cached and whether it is still valid (TTL < 5 minutes).
-Circuit Breaker State: If the cached data is valid:
-Closed State: The request proceeds to call the OneFrameAPI to fetch the latest data.
-Open State: If the circuit breaker is in an open state, an error response is returned, indicating that the service is temporarily unavailable.
-Push Metric:
+4. **Call Wrapper**:  
+   If the pair is supported, the request moves to the `callWrapper` class, which manages the logic of caching and circuit breaking:
+   - **Cached TTL Check**: The `callWrapper` verifies if there is a cached response for the currency pair and whether the TTL (time-to-live) is less than 5 minutes.
+   - **Circuit Breaker State**:
+      - **Closed State**: If no cached data exists or it is expired, a new request is sent to `OneFrameAPI` to fetch the latest data.
+      - **Open State**: If the circuit breaker is open (due to previous errors), the request fails with an error response.
 
-If the cached data is still valid and used, the system logs the metrics using the PushMetric method, ensuring that performance data is recorded for monitoring purposes.
-Response:
+5. **Push Metric**:  
+   If cached data is used, the system logs the relevant metrics using the `PushMetric` method, ensuring performance data is recorded for monitoring.
 
-Finally, the processed response is sent back to the client, either with the fetched data from OneFrameAPI or with an error message if the currency pair is not supported or if there was an issue during processing.
-Conclusion
-This workflow ensures that the /rates API endpoint operates efficiently by leveraging caching and circuit breaking, while also collecting valuable metrics for observability. This architecture allows for quick responses and robust error handling in the case of service disruptions.
+6. **Response**:  
+   The response, either from cached data or the external API, is returned to the client. If the pair is unsupported or an error occurs, an appropriate error message is returned.
 
-# Technical Overview
-In this project, I tried to implement these technical aspects to achieve a good microservice standard.
-## Frameworks and Libraries
+### Conclusion:
+This workflow leverages caching and circuit breaking to handle requests efficiently while ensuring that metrics are collected for observability and troubleshooting. The architecture helps reduce latency and maintain system resilience, even during temporary service disruptions.
+
+## Technical Overview
+This project adopts several technical approaches to meet the standard of a modern, scalable microservice.
+
+### Frameworks and Libraries:
 - **HTTP Framework**: http4s
 - **Configuration Management**: PureConfig
-- **Circuit Breaker and Resilience**: Utilize Resilience4j Circuit Breaker patterns to ensure resilient communication between services and gracefully handle failures.
-- **Asynchronous and Non-blocking IO**: Leverage Scala's functional programming ecosystem, utilizing libraries such as Cats Effect, ZIO, or Monix for effective concurrency management, non-blocking I/O, and error handling.
+- **Circuit Breaker and Resilience**: The project uses Resilience4j to apply circuit breaker patterns, which ensure resilient service communication and proper handling of failures.
+- **Asynchronous and Non-blocking IO**: Scala's functional programming ecosystem (Cats Effect, ZIO, or Monix) is used to handle concurrency, non-blocking I/O, and error handling effectively.
 
-## Resilience and Fault Tolerance
-- Implement the Circuit Breaker pattern to prevent cascading failures across services.
-- ~~Introduce the SingleFlight mechanism to optimize redundant requests.~~ The SingleFlight mechanism could not be implemented due to dependency version conflicts. This feature may be added in the future when compatibility issues are resolved.
+### Resilience and Fault Tolerance:
+- Circuit Breaker implementation prevents cascading failures across services.
+- ~~SingleFlight Mechanism (postponed)~~: Initially, the SingleFlight mechanism was considered to optimize redundant requests. However, due to dependency conflicts, this feature was not implemented and may be revisited later.
 
-## Testing
-- **Unit Testing**: Employ ScalaTest or MUnit for unit testing individual functions and logic.
+### Testing:
+- **Unit Testing**: ScalaTest or MUnit is employed to test individual units of the codebase.
 
-## Observability (Logging, Monitoring, and Tracing)
-- **Structured Logging**: Use Logback to implement structured logging, ideally in JSON format.
-- **Metrics and Monitoring**: Integrate with Prometheus for metrics collection and Grafana for monitoring dashboards. Utilize libraries like Micrometer to export JVM metrics (memory, CPU usage, thread pools).
-- ~~**Distributed Tracing**: Employ tracing libraries such as OpenTelemetry to monitor requests across distributed services, aiding in performance tracking and troubleshooting.~~ To Be Planned
+### Observability (Logging, Monitoring, and Tracing):
+- **Logging**: The project uses structured logging (Logback) in JSON format to ensure that logs are machine-readable and easy to parse.
+- **Metrics & Monitoring**: Metrics are collected via Prometheus and visualized in Grafana dashboards.
+- ~~**Distributed Tracing** (To be Planned)~~: Tracing libraries like OpenTelemetry will be integrated to monitor and trace requests across the system.
 
-## Caching
-- **Caching**: Implement Memcached to cache frequently accessed data, improving response times and reducing database load.
+### Caching:
+- **Caching**: Memcached is used to cache frequently accessed data, reducing load on the API and improving response times.
 
-## Security
-- **Data Validation**: Ensure robust data validation.
-- **HTTPS**: Ensure secure communication with other microservices in a production environment. This possible by set the host value on ENV params. 
+### Security:
+- **Data Validation**: Input data is validated to ensure robustness.
+- **HTTPS**: For production environments, HTTPS is used for secure communication between services.
 
-## Continuous Integration and Continuous Deployment (CI/CD)
-- Establish CI/CD pipelines using tools like GitHub Actions to automate testing, building, and deployment within this microservice's architecture.
+### Continuous Integration and Continuous Deployment (CI/CD):
+- CI/CD pipelines are set up using GitHub Actions to automate testing, building, and deployment within the microservice architecture.
