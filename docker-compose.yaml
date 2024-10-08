@@ -13,6 +13,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - .docker/prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
 
@@ -22,16 +23,26 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - .docker/grafana-storage:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml:ro
     depends_on:
       - prometheus
 
-  # Your Scala application
-  scala-app:
+  local-proxy-app:
     build: .
     ports:
-      - "8080:8080"  # Adjust if your app uses a different port
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:14250
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./project:/app/project
+      - ./build.sbt:/app/build.sbt
+      - ./.bsp:/app/.bsp
+      - ./.idea:/app/.idea
+    env_file:
+      - .env
     depends_on:
       - prometheus
-      - jaeger
+    profiles:
+      - app

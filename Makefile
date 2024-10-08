@@ -41,6 +41,16 @@ package:
 	@echo "Creating package..."
 	@$(SBT) package
 
+# Build Docker image
+docker-build:
+	@echo "Building Docker image..."
+	@docker build -t local-proxy-app .
+
+# Run Docker image
+docker-run:
+	@echo "Running Docker image..."
+	@docker run -p 8080:8080 local-proxy-app
+
 # Help target
 help:
 	@echo "Available targets:"
@@ -52,5 +62,7 @@ help:
 	@echo "  test     - Run tests"
 	@echo "  doc      - Generate documentation"
 	@echo "  package  - Create a distributable package"
+	@echo "  docker-build - Building Docker image"
+	@echo "  docker-run   - Running Docker image"
 
 .PHONY: all clean update compile run test doc package help
