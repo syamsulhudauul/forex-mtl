@@ -16,6 +16,7 @@ object Dependencies {
     val logback        = "1.2.11"
     val scalaCheck     = "1.15.3"
     val scalaTest      = "3.2.7"
+    val scalaTestPlus  = "3.2.9.0"
     val catsScalaCheck = "0.3.2"
 
     val micrometer     = "1.9.3"
@@ -52,6 +53,8 @@ object Dependencies {
     lazy val scalaTest      = "org.scalatest"     %% "scalatest"       % Versions.scalaTest
     lazy val scalaCheck     = "org.scalacheck"    %% "scalacheck"      % Versions.scalaCheck
     lazy val catsScalaCheck = "io.chrisdavenport" %% "cats-scalacheck" % Versions.catsScalaCheck
+    lazy val scalaTestPlus  = "org.scalatestplus" %% "mockito-3-4" % Versions.scalaTestPlus
+    lazy val scalaCatsEffectScalatest = "org.typelevel" %% "cats-effect-testing-scalatest" % Versions.ci
 
     // Metrics
     lazy val prometheus = "io.micrometer" % "micrometer-registry-prometheus" % Versions.micrometer

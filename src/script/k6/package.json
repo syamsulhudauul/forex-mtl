@@ -1,0 +1,11 @@
+{
+  "name": "k6",
+  "version": "1.0.0",
+  "description": "### Prerequisites - [K6](https://k6.io/docs/get-started/installation/) - A linux environment (WSL / MacOS should be fine)",
+  "main": "loadtest.js",
+  "scripts": {
+    "load-test": "BASE_URL=http://localhost:8080 k6 run loadtest.js "
+  },
+  "author": "",
+  "license": "ISC"
+}

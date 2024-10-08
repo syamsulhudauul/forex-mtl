@@ -1,6 +1,6 @@
 package forex
 
-import cats.effect.{ Timer, ConcurrentEffect, Resource }
+import cats.effect.{ConcurrentEffect, Resource, Timer}
 import forex.config.ApplicationConfig
 import forex.http.rates.RatesHttpRoutes
 import forex.http.metrics.MetricsHttpRoutes
@@ -10,9 +10,10 @@ import org.http4s._
 import org.http4s.implicits._
 import org.http4s.client.Client
 import org.http4s.blaze.client.BlazeClientBuilder
-import org.http4s.server.middleware.{ AutoSlash, Timeout }
-import forex.utils.metrics.{Metrics,Instrumentation}
+import org.http4s.server.middleware.{AutoSlash, Timeout}
+import forex.utils.metrics.{Instrumentation, Metrics}
 import cats.syntax.semigroupk._
+import forex.utils.callWrapper.CallWrapper
 
 import scala.concurrent.ExecutionContext
 
@@ -25,8 +26,9 @@ class Module[F[_]: ConcurrentEffect: Timer](config: ApplicationConfig) {
   private val httpClient: Resource[F, Client[F]] = BlazeClientBuilder[F](ExecutionContext.global).resource
 
   // Use the client to create the ratesService
+  private val oneFrameAPICw  = new CallWrapper[F](config.oneFrame.callWrapper,metrics)
   private val ratesService: Resource[F, RatesService[F]] = httpClient.map { client =>
-    RatesServices.api[F](client, config)
+    RatesServices.api[F](client, config, oneFrameAPICw)
   }
 
   // Use the ratesService to create the ratesProgram

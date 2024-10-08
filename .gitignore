@@ -6,6 +6,9 @@ project/.bloop
 project/target/
 project/project/
 
+# docker
+.docker/
+
 # IDE Files
 .vscode/
 .idea/
@@ -36,3 +39,5 @@ project/.bsp/
 
 # MacOS specific files
 .DS_Store
+
+.env

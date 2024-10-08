@@ -46,8 +46,9 @@ scalacOptions ++= Seq(
   "-Ycache-macro-class-loader:last-modified" // and macro definitions. This can lead to performance improvements.
 )
 
-resolvers +=
-  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers ++= Seq(
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+)
 
 libraryDependencies ++= Seq(
   compilerPlugin(Libraries.kindProjector),
@@ -69,5 +70,7 @@ libraryDependencies ++= Seq(
   Libraries.scalaTest      % Test,
   Libraries.scalaCheck     % Test,
   Libraries.catsScalaCheck % Test,
+  Libraries.scalaTestPlus % Test,
+  Libraries.scalaCatsEffectScalatest % Test,
   Libraries.prometheus,
 )

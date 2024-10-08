@@ -18,7 +18,6 @@ import io.circe.generic.auto._
 import org.typelevel.ci.CIString
 import org.slf4j.{Logger, LoggerFactory}
 import forex.utils.callWrapper.CallWrapper
-import forex.utils.metrics.Metrics
 
 // Define a case class to map the JSON response from the API
 final case class RateResponse(
@@ -28,15 +27,12 @@ final case class RateResponse(
  time_stamp: String
 )
 
-class OneFrameAPI[F[_]: Sync](client: Client[F], config: ApplicationConfig) extends Algebra[F] with Http4sClientDsl[F] {
+class OneFrameAPI[F[_]: Sync](client: Client[F], config: ApplicationConfig, callWrapper: CallWrapper[F]) extends Algebra[F] with Http4sClientDsl[F] {
   // Build the request URI based on the pair
   private def buildUri(baseUri:Uri,pair: Rate.Pair): Uri = baseUri.withQueryParam("pair", s"${pair.from}${pair.to}")
   private val token: String = config.oneFrame.token
   private val baseUri: Uri = Uri.unsafeFromString(s"${config.oneFrame.http.host}:${config.oneFrame.http.port}${config.oneFrame.pairPath}")
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
-  private val metrics = new Metrics()
-  private val callWrapper = new CallWrapper[F](config.oneFrame.callWrapper,metrics)
 
   override def get(pair: Rate.Pair): F[Error Either Rate] = {
 

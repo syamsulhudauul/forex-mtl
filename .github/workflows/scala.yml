@@ -16,9 +16,7 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 11
@@ -29,3 +27,22 @@ jobs:
         cache: 'sbt'
     - name: Run tests
       run: sbt test
+    - name: Cache sbt dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.ivy2/cache
+        key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+
+    - name: Build Docker Image
+      run: docker build -t my-scala-app .
+
+    - name: Dummy Push to container registry
+      run: |
+        echo "Simulating Docker login..."
+        echo "${{ secrets.DOCKER_PASSWORD }}" 
+        echo "docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin"
+        echo "docker push success"
+        echo
+
+
+
